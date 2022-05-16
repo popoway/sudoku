@@ -1,6 +1,7 @@
 // global param
 let matrixSize = 9;
 let groupSize = 3;
+let validCellFlag = false;
 
 // init matrix
 let matrix = new Array(matrixSize);
@@ -12,46 +13,70 @@ for (let i = 0; i < matrixSize; i++) {
 }
 
 const validCell = (row, column, value) => {
-  console.log(`validCell(${row}, ${column}, ${value})`);
+  while (validCellFlag);
+  validCellFlag = true;
+  console.debug('validCell(%d, %d, %d) invoked', row, column, value);
   for (let i = 0; i < matrixSize; i++) {
-    if (matrix[row][i] === value) return false;
-  }
-  for (let i = 0; i < matrixSize; i++) {
-    if (matrix[i][column] === value) return false;
-  }
-  for (let i = (row / groupSize) * groupSize + 0; i < (row / groupSize) * groupSize + groupSize; i++) {
-    for (let j = 0; j < groupSize; j++) {
-      if (matrix[i][j] === value) return false;
+    if (matrix[row][i] === value) {
+      console.debug('validCell(%d, %d, %d) returns false', row, column, value);
+      validCellFlag = false;
+      return false;
     }
   }
+  for (let i = 0; i < matrixSize; i++) {
+    if (matrix[i][column] === value) {
+      console.debug('validCell(%d, %d, %d) returns false', row, column, value);
+      validCellFlag = false;
+      return false;
+    }
+  }
+  for (let i = (row / groupSize) * groupSize + 0; i < (row / groupSize) * groupSize + groupSize; i++) {
+    for (let j = (row / groupSize) * groupSize + 0; j < (row / groupSize) * groupSize + groupSize; j++) {
+      if (matrix[i][j] === value) {
+        console.debug('validCell(%d, %d, %d) returns false', row, column, value);
+        validCellFlag = false;
+        return false;
+      }
+    }
+  }
+  console.debug('validCell(%d, %d, %d) returns true', row, column, value);
+  validCellFlag = false;
   return true;
 }
 
+const setCell = (row, column, value) => {
+  console.debug('setCell(%d, %d, %d) invoked', row, column, value);
+  matrix[row][column] = value;
+  renderMatrix();
+}
+
+const getCell = (row, column) => {
+  console.debug('getCell(%d, %d) invoked', row, column);
+  return matrix[row][column];
+  renderMatrix();
+}
+
 const populateCell = (row, column) => {
+  console.debug('populateCell(%d, %d) invoked', row, column);
   if (matrix[row][column] !== -1) {
     return matrix[row][column];
   } else {
     while (matrix[row][column] === -1) {
-      setTimeout(() => {
-      }, 5000);
       let num = Math.floor(Math.random() * 9 + 1);
-      console.log('num: %d', num);
+      console.debug('Pick random num: %d', num);
       if (validCell(row, column, num)) {
-        matrix[row][column] = num;
+        return setCell(row, column, num);
       }
     }
-    return matrix[row][column];
   }
 }
 
 const renderMatrix = () => {
+  console.debug('renderMatrix() invoked');
   let a = '';
 
-  for (let i = 0; i < 9; i++) {
-    for (let j = 0; j < 9; j++) {
-      // setTimeout(() => {
-      //   populateCell(i, j);
-      // }, 5000);
+  for (let i = 0; i < matrixSize; i++) {
+    for (let j = 0; j < matrixSize; j++) {
       a += matrix[i][j] + ' ';
       document.querySelector('#entry').innerHTML = a;
     }
@@ -60,5 +85,17 @@ const renderMatrix = () => {
 }
 
 document.addEventListener('DOMContentLoaded', (evt) => {
+  console.debug('matrixSize: %d', matrixSize);
+  console.debug('groupSize: %d', groupSize);
   renderMatrix();
+  for (let i = 0; i < matrixSize; i++) {
+    for (let j = 0; j < matrixSize; j++) {
+      setTimeout(() => {
+        if (i <= 4) {
+          populateCell(i, j);
+
+        }
+      }, 100);
+    }
+  }
 })
