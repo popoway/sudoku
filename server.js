@@ -1,6 +1,7 @@
 var express = require('express');
 var fs = require('fs');
 var path = require('path');
+const open = require('open');
 var PORT = process.env.PORT || 3000;
 
 express()
@@ -9,4 +10,5 @@ express()
 
 function onListen() {
   console.log('\x1b[36m%s\x1b[0m', 'The popoway-me debug server is now running on localhost:' + PORT, '\nHit Control + C to terminate.');
+  open(`http://localhost:${PORT}`);
 }

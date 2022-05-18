@@ -12,35 +12,46 @@ for (let i = 0; i < matrixSize; i++) {
   }
 }
 
+/**
+ * Checks if a value will be valid if filled in specified cell.
+ * @param {number} row Row of the specified cell.
+ * @param {number} column Column of the specified cell.
+ * @param {number} value Value to be filled in the specified cell.
+ * @returns {boolean} `true` if the cell will be valid, `false` if the cell will be invalid.
+ */
 const validCell = (row, column, value) => {
-  while (validCellFlag);
-  validCellFlag = true;
   console.debug('validCell(%d, %d, %d) invoked', row, column, value);
   for (let i = 0; i < matrixSize; i++) {
     if (matrix[row][i] === value) {
       console.debug('validCell(%d, %d, %d) returns false', row, column, value);
-      validCellFlag = false;
       return false;
     }
   }
   for (let i = 0; i < matrixSize; i++) {
     if (matrix[i][column] === value) {
       console.debug('validCell(%d, %d, %d) returns false', row, column, value);
-      validCellFlag = false;
       return false;
     }
   }
-  for (let i = (row / groupSize) * groupSize + 0; i < (row / groupSize) * groupSize + groupSize; i++) {
-    for (let j = (row / groupSize) * groupSize + 0; j < (row / groupSize) * groupSize + groupSize; j++) {
+  for (let i = (Math.floor(row / groupSize)) * groupSize + 0; i < (Math.floor(row / groupSize)) * groupSize + groupSize; i++) {
+    for (let j = (Math.floor(column / groupSize)) * groupSize + 0; j < (Math.floor(column / groupSize)) * groupSize + groupSize; j++) {
+      // console.debug(row, column, i, j, matrix[i][j], " ", value);
       if (matrix[i][j] === value) {
         console.debug('validCell(%d, %d, %d) returns false', row, column, value);
-        validCellFlag = false;
         return false;
       }
     }
   }
   console.debug('validCell(%d, %d, %d) returns true', row, column, value);
-  validCellFlag = false;
+  return true;
+}
+
+const validMatrix = () => {
+  for (let i = 0; i < matrixSize; i++) {
+    for (let j = 0; j < matrixSize; j++) {
+      if (!validCell(i, j, getCell(i, j))) return false;
+    }
+  }
   return true;
 }
 
@@ -56,13 +67,28 @@ const getCell = (row, column) => {
   renderMatrix();
 }
 
-const populateCell = (row, column) => {
-  console.debug('populateCell(%d, %d) invoked', row, column);
-  if (matrix[row][column] !== -1) {
-    return matrix[row][column];
+/**
+ * Populate the specified cell with a valid value.
+ * @param {*} row 
+ * @param {*} column 
+ * @param {boolean} random By default, values are attempted sequentially from 0; if `true`, any valid value may be used randomly to populate.
+ * @returns The populated value, or `-1` if no possible valid value can be populated.
+ */
+const populateCell = (row, column, random) => {
+  console.debug('populateCell(%d, %d, %d) invoked', row, column, random);
+  if (!(random === true)) {
+    for (let i = 0; i < matrixSize; i++) {
+      if (validCell(row, column, i)) {
+        return setCell(row, column, i);
+      }
+    }
+    return -1;
   } else {
-    while (matrix[row][column] === -1) {
+    let values = new Set();
+    while (values.size < matrixSize) {
       let num = Math.floor(Math.random() * 9 + 1);
+      if (values.has(num)) continue;
+      values.add(num);
       console.debug('Pick random num: %d', num);
       if (validCell(row, column, num)) {
         return setCell(row, column, num);
@@ -89,13 +115,12 @@ document.addEventListener('DOMContentLoaded', (evt) => {
   console.debug('groupSize: %d', groupSize);
   renderMatrix();
   for (let i = 0; i < matrixSize; i++) {
+    if (i == 9) break;
     for (let j = 0; j < matrixSize; j++) {
+      if (i == 8 && j == 1) break;
       setTimeout(() => {
-        if (i <= 4) {
-          populateCell(i, j);
-
-        }
-      }, 100);
+        populateCell(i, j, true);
+      }, 500);
     }
   }
 })
