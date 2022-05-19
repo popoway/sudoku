@@ -64,7 +64,6 @@ const setCell = (row, column, value) => {
 const getCell = (row, column) => {
   console.debug('getCell(%d, %d) invoked', row, column);
   return matrix[row][column];
-  renderMatrix();
 }
 
 /**
@@ -103,7 +102,11 @@ const renderMatrix = () => {
 
   for (let i = 0; i < matrixSize; i++) {
     for (let j = 0; j < matrixSize; j++) {
-      a += matrix[i][j] + ' ';
+      if (getCell(i, j) === -1) {
+        a += '&nbsp;' + ' ';
+      } else {
+        a += getCell(i, j) + ' ';
+      }
       document.querySelector('#entry').innerHTML = a;
     }
     a += '<br>'
@@ -115,11 +118,13 @@ document.addEventListener('DOMContentLoaded', (evt) => {
   console.debug('groupSize: %d', groupSize);
   renderMatrix();
   for (let i = 0; i < matrixSize; i++) {
-    if (i == 9) break;
+    if (i == 10) break;
     for (let j = 0; j < matrixSize; j++) {
-      if (i == 8 && j == 1) break;
+      if (i == 9 && j == 1) break;
       setTimeout(() => {
-        populateCell(i, j, true);
+        if (Math.random() < 0.1) {
+          populateCell(i, j, true);
+        }
       }, 500);
     }
   }
