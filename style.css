@@ -3,6 +3,12 @@
   font-size: 1.2em;
 }
 
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
 @media screen and (prefers-color-scheme: dark) {
   body {
     background-color: black;

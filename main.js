@@ -58,7 +58,6 @@ const validMatrix = () => {
 const setCell = (row, column, value) => {
   console.debug('setCell(%d, %d, %d) invoked', row, column, value);
   matrix[row][column] = value;
-  renderMatrix();
 }
 
 const getCell = (row, column) => {
@@ -98,34 +97,45 @@ const populateCell = (row, column, random) => {
 
 const renderMatrix = () => {
   console.debug('renderMatrix() invoked');
-  let a = '';
+  let table = document.createElement('table');
+  console.log(table)
+  for (let i = 0; i < matrixSize; i++) {
+    let row = table.insertRow(i);
+    for (let j = 0; j < matrixSize; j++) {
+      let cell = row.insertCell(j);
+      cell.innerHTML = getCell(i, j) === -1 ? '&nbsp;' : getCell(i, j);
+    }
+  }
+  document.querySelector('#sudoku-container').innerHTML = '';
+  document.querySelector('#sudoku-container').appendChild(table);
+}
 
+const populateMatrix = (ratio) => {
+  for (let i = 0; i < matrixSize; i++) {
+    if (i == 10) break;
+    for (let j = 0; j < matrixSize; j++) {
+      if (i == 9 && j == 1) break;
+      setTimeout(() => {
+        if (Math.random() < ratio) {
+          populateCell(i, j, true);
+        }
+      }, 500);
+    }
+  }
+  renderMatrix();
+}
+
+const clearMatrix = () => {
   for (let i = 0; i < matrixSize; i++) {
     for (let j = 0; j < matrixSize; j++) {
-      if (getCell(i, j) === -1) {
-        a += '&nbsp;' + ' ';
-      } else {
-        a += getCell(i, j) + ' ';
-      }
-      document.querySelector('#entry').innerHTML = a;
+      setCell(i, j, -1)
     }
-    a += '<br>'
   }
+  renderMatrix();
 }
 
 document.addEventListener('DOMContentLoaded', (evt) => {
   console.debug('matrixSize: %d', matrixSize);
   console.debug('groupSize: %d', groupSize);
   renderMatrix();
-  for (let i = 0; i < matrixSize; i++) {
-    if (i == 10) break;
-    for (let j = 0; j < matrixSize; j++) {
-      if (i == 9 && j == 1) break;
-      setTimeout(() => {
-        if (Math.random() < 0.1) {
-          populateCell(i, j, true);
-        }
-      }, 500);
-    }
-  }
 })
